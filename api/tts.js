@@ -39,10 +39,9 @@ module.exports = async (req, res) => {
     };
 
     const selectedVoice = voiceMap[voice] || voiceMap.default;
-    const outputAudioFormat = 'MP3'; // Gemini outputs MP3
 
-    // Use Gemini TTS API
-    const model = 'gemini-2.0-flash-exp';
+    // Use Gemini TTS API with dedicated TTS model
+    const model = 'gemini-2.0-flash-exp'; // Gemini TTS model
     const ttsUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
 
     const ttsRequest = {
@@ -54,6 +53,7 @@ module.exports = async (req, res) => {
       generationConfig: {
         responseModalities: ["AUDIO"],
         audioConfig: {
+          audioEncoding: "MP3",
           voiceConfig: {
             prebuiltVoiceConfig: {
               voiceName: selectedVoice
