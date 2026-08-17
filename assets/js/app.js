@@ -225,51 +225,27 @@ function setupGenerateButton() {
         elements.generateBtn.disabled = true;
 
         try {
-            const response = await fetch(`${API_BASE}/api/tts`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    text: text,
-                    voice: state.selectedVoice,
-                    speed: 'normal'
-                })
-            });
-
-            if (!response.ok) {
-                const error = await response.json();
-                throw new Error(error.message || 'API request failed');
-            }
-
-            const data = await response.json();
+            // Use Web Speech API for TTS (no API key needed)
+            await speakText(text, state.selectedVoice);
             
-            if (data.success && data.audio) {
-                // Play the audio
-                const audio = new Audio(data.audio);
-                await audio.play();
-                
-                // Update usage
-                state.usageUsed += text.length;
-                if (state.currentMode === 'tts') {
-                    state.ttsCount++;
-                } else {
-                    state.srtCount++;
-                }
-                
-                saveState();
-                updateUsageDisplay();
-                
-                showToast('အသံဖန်တီးပြီးပါပြီ! 🎉', 'success');
-                
-                // Clear input
-                elements.textInput.value = '';
-                state.charCount = 0;
-                elements.charCount.textContent = '0';
-                elements.charCount.style.color = 'var(--text-muted)';
+            // Update usage
+            state.usageUsed += text.length;
+            if (state.currentMode === 'tts') {
+                state.ttsCount++;
             } else {
-                throw new Error('Invalid response from server');
+                state.srtCount++;
             }
+            
+            saveState();
+            updateUsageDisplay();
+            
+            showToast('အသံဖန်တီးပြီးပါပြီ! 🎉', 'success');
+            
+            // Clear input
+            elements.textInput.value = '';
+            state.charCount = 0;
+            elements.charCount.textContent = '0';
+            elements.charCount.style.color = 'var(--text-muted)';
             
         } catch (error) {
             console.error('TTS Error:', error);
@@ -279,6 +255,63 @@ function setupGenerateButton() {
             elements.generateBtn.disabled = false;
         }
     });
+}
+
+// ===== Web Speech API TTS =====
+function speakText(text, voice) {
+    return new Promise((resolve, reject) => {
+        // Check if speech synthesis is supported
+        if (!('speechSynthesis' in window)) {
+            reject(new Error('Browser does not support speech synthesis'));
+            return;
+        }
+
+        // Cancel any ongoing speech
+        window.speechSynthesis.cancel();
+
+        const utterance = new SpeechSynthesisUtterance(text);
+        
+        // Set language to Burmese/Myanmar
+        utterance.lang = 'my-MM';
+        
+        // Adjust rate based on voice selection
+        utterance.rate = 0.9;
+        utterance.pitch = voice === 'thiha' ? 0.8 : 1.2;
+        
+        // Try to find a suitable voice
+        const voices = window.speechSynthesis.getVoices();
+        
+        // Look for Myanmar voices first, then fallback to any Burmese-supporting voice
+        let selectedVoice = voices.find(v => v.lang.includes('my')) ||
+                           voices.find(v => v.lang.includes('MM')) ||
+                           voices.find(v => v.lang.includes('Burmese')) ||
+                           voices[0]; // Fallback to first available voice
+        
+        if (selectedVoice) {
+            utterance.voice = selectedVoice;
+        }
+
+        // Handle events
+        utterance.onend = () => resolve();
+        utterance.onerror = (event) => {
+            if (event.error !== 'canceled') {
+                reject(new Error(event.error || 'Speech synthesis failed'));
+            } else {
+                resolve(); // Consider cancel as success
+            }
+        };
+
+        // Start speaking
+        window.speechSynthesis.speak(utterance);
+    });
+}
+
+// Preload voices
+if ('speechSynthesis' in window) {
+    window.speechSynthesis.getVoices();
+    window.speechSynthesis.onvoiceschanged = () => {
+        window.speechSynthesis.getVoices();
+    };
 }
 
 // ===== API Key =====
