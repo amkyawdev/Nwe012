@@ -70,17 +70,35 @@ module.exports = async (req, res) => {
 
     const ttsData = await ttsResponse.json();
     
-    // Extract audio from response
-    const audioBase64 = ttsData?.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
-
-    if (!audioBase64) {
+    // Extract audio from response - handle nested structure
+    const inlineData = ttsData?.candidates?.[0]?.content?.parts?.[0]?.inlineData;
+    
+    if (!inlineData?.data) {
+      // Check if there's text content instead of audio
+      const textContent = ttsData?.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (textContent) {
+        throw new Error('Gemini returned text instead of audio. Check your API key and try again.');
+      }
       throw new Error('No audio generated from Gemini API');
+    }
+
+    // Get the actual audio format from the response
+    const audioMimeType = inlineData.mimeType || 'audio/L16;codec=pcm;rate=24000';
+    const audioBase64 = inlineData.data;
+
+    // Determine format from mimeType
+    let format = 'wav';
+    if (audioMimeType.includes('mp3') || audioMimeType.includes('mpeg')) {
+      format = 'mp3';
+    } else if (audioMimeType.includes('webm')) {
+      format = 'webm';
     }
 
     return res.status(200).json({
       success: true,
-      audio: `data:audio/mp3;base64,${audioBase64}`,
-      format: 'mp3',
+      audio: `data:${audioMimeType};base64,${audioBase64}`,
+      format: format,
+      mimeType: audioMimeType,
       voice: selectedVoice,
       charCount: text.length
     });
