@@ -473,17 +473,41 @@ function setupApiKey() {
 }
 
 // ===== Usage Tracking =====
+// ===== Auto Reset Check =====
+function checkAutoReset() {
+    const savedData = localStorage.getItem('amkyaw_tts_state');
+    if (savedData) {
+        const data = JSON.parse(savedData);
+        const lastResetTime = data.lastResetTime || 0;
+        const now = Date.now();
+        const hoursPassed = (now - lastResetTime) / (1000 * 60 * 60);
+        
+        // Auto reset after 24 hours
+        if (hoursPassed >= 24) {
+            state.usageUsed = 0;
+            state.ttsCount = 0;
+            state.srtCount = 0;
+            saveState();
+            showToast('Usage အလိုအလျှောက် Reset ပြီးပါပြီ (24 နာရီ)', 'info');
+        } else {
+            state.usageUsed = data.usageUsed || 0;
+            state.ttsCount = data.ttsCount || 0;
+            state.srtCount = data.srtCount || 0;
+        }
+    }
+}
+
 function setupUsageTracking() {
-    elements.resetUsage.addEventListener('click', () => {
-        state.usageUsed = 0;
-        state.ttsCount = 0;
-        state.srtCount = 0;
-        
-        saveState();
-        updateUsageDisplay();
-        
-        showToast('Reset ပြီးပါပြီ', 'success');
-    });
+    // Check for auto reset on load
+    checkAutoReset();
+    
+    // Check auto reset periodically (every hour)
+    setInterval(checkAutoReset, 60 * 60 * 1000);
+    
+    // Hide manual reset button (auto reset only)
+    if (elements.resetUsage) {
+        elements.resetUsage.style.display = 'none';
+    }
 
     updateUsageDisplay();
 }
@@ -515,19 +539,14 @@ function saveState() {
     localStorage.setItem('amkyaw_tts_state', JSON.stringify({
         usageUsed: state.usageUsed,
         ttsCount: state.ttsCount,
-        srtCount: state.srtCount
+        srtCount: state.srtCount,
+        lastResetTime: Date.now()
     }));
 }
 
 function loadState() {
-    const saved = localStorage.getItem('amkyaw_tts_state');
-    if (saved) {
-        const data = JSON.parse(saved);
-        state.usageUsed = data.usageUsed || 0;
-        state.ttsCount = data.ttsCount || 0;
-        state.srtCount = data.srtCount || 0;
-        updateUsageDisplay();
-    }
+    checkAutoReset();
+    updateUsageDisplay();
 }
 
 // ===== Toast Notifications =====

@@ -72,6 +72,16 @@
                     </svg>
                     <span>Usage</span>
                 </a>
+                <a href="#docs" class="nav-link" data-page="docs">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                        <polyline points="14 2 14 8 20 8"/>
+                        <line x1="16" y1="13" x2="8" y2="13"/>
+                        <line x1="16" y1="17" x2="8" y2="17"/>
+                        <polyline points="10 9 9 9 8 9"/>
+                    </svg>
+                    <span>Docs</span>
+                </a>
                 <a href="#developer" class="nav-link" data-page="developer">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
@@ -505,13 +515,13 @@
                         <p class="usage-label">ကျန်ရှိ <span id="usageRemaining">5,000</span> စာလုံး</p>
                     </div>
                     
-                    <button class="btn btn-secondary" id="resetUsage">
+                    <div class="auto-reset-notice">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polyline points="1 4 1 10 7 10"/>
-                            <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/>
+                            <circle cx="12" cy="12" r="10"/>
+                            <polyline points="12 6 12 12 16 14"/>
                         </svg>
-                        Reset
-                    </button>
+                        <span>24 နာရီအကြာတွင် အလိုအလျှောက် Reset ပါ့မည်</span>
+                    </div>
                 </div>
 
                 <div class="usage-stats-grid">
@@ -602,6 +612,265 @@
                 <div class="about-card animate-card">
                     <h3>AmkyawDev TTS အကြောင်း</h3>
                     <p>AmkyawDev TTS သည် မြန်မာစာကို သဘာဝကျသော အသံဖြင့် ဖတ်ပြရန် ရည်ရွယ်၍ တည်ဆောက်ထားသော AI Voice Studio တစ်ခုဖြစ်ပါသည်။</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Docs Page -->
+        <section id="docs" class="page">
+            <div class="page-header">
+                <h1 class="page-title animate-item">
+                    <span class="title-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                            <polyline points="14 2 14 8 20 8"/>
+                            <line x1="16" y1="13" x2="8" y2="13"/>
+                            <line x1="16" y1="17" x2="8" y2="17"/>
+                            <polyline points="10 9 9 9 8 9"/>
+                        </svg>
+                    </span>
+                    Documentation
+                </h1>
+                <p class="page-description animate-item">အသုံးပြုနည်းများနှင့် အချက်အလက်များ</p>
+            </div>
+
+            <div class="docs-container">
+                <!-- What is TTS -->
+                <div class="docs-card animate-card">
+                    <h2 class="docs-title">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/>
+                            <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                            <line x1="12" x2="12" y1="19" y2="22"/>
+                        </svg>
+                        Text-to-Speech (TTS) ဆိုတာဘာလဲ?
+                    </h2>
+                    <div class="docs-content">
+                        <p><strong>Text-to-Speech (TTS)</strong> သည် စာသား (Text) ကို လူသားအသံနဲ့တူသော အသံ (Audio) အဖြစ် ပြောင်းလဲပေးသည့် နည်းပညာတစ်ခုဖြစ်ပါသည်။</p>
+                        
+                        <div class="docs-features">
+                            <div class="docs-feature">
+                                <span class="feature-icon">🎙️</span>
+                                <div>
+                                    <strong>မြန်မာစာ Support</strong>
+                                    <p>မြန်မာဘာသာစကားကို သဘာဝကျအောင် ဖတ်ပေးနိုင်ပါသည်</p>
+                                </div>
+                            </div>
+                            <div class="docs-feature">
+                                <span class="feature-icon">🎨</span>
+                                <div>
+                                    <strong>Voice Options</strong>
+                                    <p>ကျားအသံ (သီဟ) နှင့် မိန်းမအသံ (နီလာ) ရွေးချယ်နိုင်ပါသည်</p>
+                                </div>
+                            </div>
+                            <div class="docs-feature">
+                                <span class="feature-icon">📱</span>
+                                <div>
+                                    <strong>Multi-Purpose</strong>
+                                    <p>Podcasts, Videos, Audiobooks, Accessibility စသည်တို့အတွက် အသုံးပြုနိုင်ပါသည်</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- What is SRT -->
+                <div class="docs-card animate-card">
+                    <h2 class="docs-title">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                            <line x1="3" y1="9" x2="21" y2="9"/>
+                            <line x1="9" y1="21" x2="9" y2="9"/>
+                        </svg>
+                        SRT Format ဆိုတာဘာလဲ?
+                    </h2>
+                    <div class="docs-content">
+                        <p><strong>SRT (SubRip Subtitle)</strong> သည် Video subtitles/closed captions များအတွက် အသုံးပြုသည့် file format တစ်ခုဖြစ်ပါသည်။</p>
+                        
+                        <div class="code-example">
+                            <div class="code-header">
+                                <span>SRT Example</span>
+                            </div>
+                            <pre>1
+00:00:01,000 --> 00:00:04,000
+မင်္ဂလာပါ
+
+2
+00:00:05,000 --> 00:00:08,000
+ဒီဟာက စာသားဖြစ်ပါသည်
+
+3
+00:00:09,000 --> 00:00:12,000
+Timecode format: HH:MM:SS,mmm</pre>
+                        </div>
+
+                        <div class="docs-features">
+                            <div class="docs-feature">
+                                <span class="feature-icon">⏱️</span>
+                                <div>
+                                    <strong>Timestamp</strong>
+                                    <p>အသံဖွင့်/ပိတ်ချိန်ကို သတ်မှတ်နိုင်ပါသည်</p>
+                                </div>
+                            </div>
+                            <div class="docs-feature">
+                                <span class="feature-icon">🎬</span>
+                                <div>
+                                    <strong>Video Subtitles</strong>
+                                    <p>YouTube, ရုပ်သံများအတွက် subtitle ဖန်တီးနိုင်ပါသည်</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- API Key Setup -->
+                <div class="docs-card animate-card">
+                    <h2 class="docs-title">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/>
+                        </svg>
+                        API Key ရယူနည်း
+                    </h2>
+                    <div class="docs-content">
+                        <div class="step-guide">
+                            <div class="step">
+                                <span class="step-num">1</span>
+                                <div class="step-content">
+                                    <h4>Google AI Studio သို့သွားပါ</h4>
+                                    <p><a href="https://aistudio.google.com" target="_blank">https://aistudio.google.com</a> မှာ login ဝင်ပါ</p>
+                                </div>
+                            </div>
+                            <div class="step">
+                                <span class="step-num">2</span>
+                                <div class="step-content">
+                                    <h4>API Key ဖန်တီးပါ</h4>
+                                    <p>Sidebar မှ "Get API Key" ကိုနှိပ်ပြီး "Create API Key" ကို နှိပ်ပါ</p>
+                                </div>
+                            </div>
+                            <div class="step">
+                                <span class="step-num">3</span>
+                                <div class="step-content">
+                                    <h4>Key ကို Copy လုပ်ပါ</h4>
+                                    <p>ရရှိသော API Key ကို copy လုပ်ပြီး App မှာ ထည့်သွင်းပါ</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="note-box note-info">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"/>
+                                <line x1="12" y1="16" x2="12" y2="12"/>
+                                <line x1="12" y1="8" x2="12.01" y2="8"/>
+                            </svg>
+                            <div>
+                                <strong>API Type</strong>
+                                <p>Gemini (default) သို့မဟုတ် AI Studio ကိုရွေးချယ်နိုင်ပါသည်</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Google Cloud Setup -->
+                <div class="docs-card animate-card">
+                    <h2 class="docs-title">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                        </svg>
+                        Google Cloud TTS API ဖွင့်နည်း
+                    </h2>
+                    <div class="docs-content">
+                        <div class="alert-box alert-warning">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                                <line x1="12" y1="9" x2="12" y2="13"/>
+                                <line x1="12" y1="17" x2="12.01" y2="17"/>
+                            </svg>
+                            <div>
+                                <strong>Important!</strong>
+                                <p>API Key သုံးမယ်ဆိုရင် Google Cloud Console မှာ TTS API ကို enable လုပ်ဖို့လိုပါသည်</p>
+                            </div>
+                        </div>
+
+                        <div class="step-guide">
+                            <div class="step">
+                                <span class="step-num">1</span>
+                                <div class="step-content">
+                                    <h4>Google Cloud Console သို့သွားပါ</h4>
+                                    <p><a href="https://console.cloud.google.com" target="_blank">https://console.cloud.google.com</a> မှာ login ဝင်ပါ</p>
+                                </div>
+                            </div>
+                            <div class="step">
+                                <span class="step-num">2</span>
+                                <div class="step-content">
+                                    <h4>Project ရွေးပါ</h4>
+                                    <p>API Key နဲ့ချိတ်ဆက်ထားတဲ့ Project ကို select လုပ်ပါ</p>
+                                </div>
+                            </div>
+                            <div class="step">
+                                <span class="step-num">3</span>
+                                <div class="step-content">
+                                    <h4>Text-to-Speech API ကို Enable လုပ်ပါ</h4>
+                                    <p><a href="https://console.cloud.google.com/apis/library/texttospeech.googleapis.com" target="_blank">ဤလင့်ခ်</a> မှာ Enable နှိပ်ပါ</p>
+                                </div>
+                            </div>
+                            <div class="step">
+                                <span class="step-num">4</span>
+                                <div class="step-content">
+                                    <h4>စမ်းသပ်ပါ</h4>
+                                    <p>၂-၃ မိနစ်စောင့်ပြီး App မှာ စမ်းသပ်ပါ</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="note-box note-success">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                                <polyline points="22 4 12 14.01 9 11.01"/>
+                            </svg>
+                            <div>
+                                <strong>Free Trial</strong>
+                                <p>Google Cloud မှာ $300 credit အခမဲ့ရနိုင်ပါသည်</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Output Formats -->
+                <div class="docs-card animate-card">
+                    <h2 class="docs-title">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 18V5l12-2v13"/>
+                            <circle cx="6" cy="18" r="3"/>
+                            <circle cx="18" cy="16" r="3"/>
+                        </svg>
+                        Output Formats
+                    </h2>
+                    <div class="docs-content">
+                        <div class="format-comparison">
+                            <div class="format-item">
+                                <div class="format-badge mp3">MP3</div>
+                                <h4>MP3 Format</h4>
+                                <ul>
+                                    <li>✅ Smaller file size</li>
+                                    <li>✅ Best compatibility</li>
+                                    <li>✅ Fast download</li>
+                                    <li>✅ Web friendly</li>
+                                </ul>
+                                <p class="format-use">အသုံးအများဆုံး - Podcast, Social Media, Web</p>
+                            </div>
+                            <div class="format-item">
+                                <div class="format-badge wav">WAV</div>
+                                <h4>WAV Format</h4>
+                                <ul>
+                                    <li>✅ Lossless quality</li>
+                                    <li>✅ No compression</li>
+                                    <li>✅ Edit friendly</li>
+                                    <li>❌ Larger file size</li>
+                                </ul>
+                                <p class="format-use">အရည်အသွေးမြင့် - Video editing, Audio production</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
