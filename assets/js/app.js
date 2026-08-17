@@ -220,12 +220,20 @@ function setupGenerateButton() {
             return;
         }
 
+        // Get API key from storage
+        const apiKey = localStorage.getItem('amkyaw_tts_api_key');
+        if (!apiKey) {
+            showToast('API Key ထည့်သွင်းပါ', 'warning');
+            navigateToPage('api');
+            return;
+        }
+
         // Show loading state
         elements.generateBtn.classList.add('loading');
         elements.generateBtn.disabled = true;
 
         try {
-            // Call API
+            // Call API with API key
             const response = await fetch(`${API_BASE}/api/tts`, {
                 method: 'POST',
                 headers: {
@@ -234,7 +242,8 @@ function setupGenerateButton() {
                 body: JSON.stringify({
                     text: text,
                     voice: state.selectedVoice,
-                    format: 'mp3'
+                    format: 'mp3',
+                    apiKey: apiKey
                 })
             });
 

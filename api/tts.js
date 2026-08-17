@@ -1,5 +1,3 @@
-const { TextToSpeechClient } = require('@google-cloud/text-to-speech');
-
 module.exports = async (req, res) => {
   // CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -23,54 +21,60 @@ module.exports = async (req, res) => {
       return res.status(400).json({ error: 'Text is required' });
     }
 
-    // Voice mapping for Google Cloud TTS
+    // Voice mapping
     const voiceMap = {
-      'thiha': { name: 'my-MM-Standard-A', lang: 'my-MM', ssmlGender: 'MALE' },
-      'nayliya': { name: 'my-MM-Standard-A', lang: 'my-MM', ssmlGender: 'FEMALE' },
-      'default': { name: 'my-MM-Standard-A', lang: 'my-MM', ssmlGender: 'FEMALE' }
+      'thiha': { langCode: 'my-MM', name: 'my-MM-Standard-A', gender: 'MALE' },
+      'nayliya': { langCode: 'my-MM', name: 'my-MM-Standard-A', gender: 'FEMALE' },
+      'default': { langCode: 'my-MM', name: 'my-MM-Standard-A', gender: 'FEMALE' }
     };
 
     const selectedVoice = voiceMap[voice] || voiceMap.default;
     const audioFormat = format === 'wav' ? 'LINEAR16' : 'MP3';
 
-    // Check for API key
-    const apiKey = process.env.GOOGLE_TTS_API_KEY;
+    // Get API key from environment or request body
+    const apiKey = process.env.GEMINI_API_KEY || req.body.apiKey;
 
     if (!apiKey) {
       return res.status(400).json({ 
         error: 'API key required',
-        message: 'Please add GOOGLE_TTS_API_KEY in Vercel Environment Variables'
+        message: 'Please provide your Gemini/AI Studio API Key'
       });
     }
 
-    // Create client with API key
-    const client = new TextToSpeechClient({ apiKey });
+    // Use Google Cloud TTS API directly
+    const ttsUrl = `https://texttospeech.googleapis.com/v1/text:synthesize?key=${apiKey}`;
 
-    // Construct the request
-    const request = {
+    const ttsRequest = {
       input: { text: text },
       voice: {
-        languageCode: selectedVoice.lang,
+        languageCode: selectedVoice.langCode,
         name: selectedVoice.name,
-        ssmlGender: selectedVoice.ssmlGender,
       },
       audioConfig: {
         audioEncoding: audioFormat,
-        speakingRate: 0.9,
+        speakingRate: 0.95,
         pitch: 0,
+        sampleRateHertz: 24000,
       },
     };
 
-    // Generate audio
-    const [response] = await client.synthesizeSpeech(request);
+    const ttsResponse = await fetch(ttsUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(ttsRequest)
+    });
 
-    // Convert buffer to base64
-    const audioContent = response.audioContent.toString('base64');
-    const mimeType = audioFormat === 'MP3' ? 'audio/mp3' : 'audio/wav';
+    if (!ttsResponse.ok) {
+      const errorData = await ttsResponse.json();
+      throw new Error(errorData.error?.message || 'TTS API request failed');
+    }
+
+    const ttsData = await ttsResponse.json();
+    const mimeType = audioFormat === 'MP3' ? 'audio/mpeg' : 'audio/wav';
 
     return res.status(200).json({
       success: true,
-      audio: `data:${mimeType};base64,${audioContent}`,
+      audio: `data:${mimeType};base64,${ttsData.audioContent}`,
       format: audioFormat === 'MP3' ? 'mp3' : 'wav',
       voice: selectedVoice.name,
       charCount: text.length
