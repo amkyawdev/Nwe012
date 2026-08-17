@@ -3,7 +3,6 @@ const state = {
     currentPage: 'home',
     currentMode: 'tts',
     selectedVoice: 'thiha',
-    selectedFormat: localStorage.getItem('amkyaw_tts_format') || 'mp3',
     charCount: 0,
     usageUsed: 0,
     usageLimit: 5000,
@@ -57,9 +56,6 @@ function initApp() {
 
     // Voice selection
     setupVoiceSelection();
-
-    // Format selection
-    setupFormatSelection();
 
     // Text input
     setupTextInput();
@@ -186,35 +182,6 @@ function setupVoiceSelection() {
     });
 }
 
-// ===== Format Selection =====
-function setupFormatSelection() {
-    // Load saved format
-    const savedFormat = localStorage.getItem('amkyaw_tts_format') || 'mp3';
-    const formatInputs = document.querySelectorAll('input[name="format"]');
-    
-    formatInputs.forEach(input => {
-        if (input.value === savedFormat) {
-            input.checked = true;
-            // Also update the label class
-            const label = input.closest('.format-option');
-            if (label) label.classList.add('selected');
-        }
-        
-        input.addEventListener('change', () => {
-            state.selectedFormat = input.value;
-            localStorage.setItem('amkyaw_tts_format', input.value);
-            
-            // Update label classes
-            formatInputs.forEach(i => {
-                const label = i.closest('.format-option');
-                if (label) label.classList.remove('selected');
-            });
-            const label = input.closest('.format-option');
-            if (label) label.classList.add('selected');
-        });
-    });
-}
-
 // ===== Text Input =====
 function setupTextInput() {
     elements.textInput.addEventListener('input', (e) => {
@@ -275,7 +242,6 @@ function setupGenerateButton() {
                 body: JSON.stringify({
                     text: text,
                     voice: state.selectedVoice,
-                    format: state.selectedFormat,
                     apiKey: apiKey
                 })
             });
