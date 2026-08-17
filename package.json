@@ -1,15 +1,13 @@
 {
   "name": "amkyawdev-tts",
   "version": "1.0.0",
-  "description": "Myanmar Text-to-Speech API with Gemini TTS",
+  "description": "Myanmar Text-to-Speech API",
   "main": "api/index.js",
   "scripts": {
-    "start": "node api/index.js",
-    "dev": "node api/index.js"
+    "vercel-build": "npm install",
+    "build": "npm install"
   },
   "dependencies": {
-    "@google/generative-ai": "^0.21.0",
-    "edge-tts": "^6.0.2",
     "micro": "^10.0.1"
   }
 }

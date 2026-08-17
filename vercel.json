@@ -1,6 +1,5 @@
 {
   "version": 2,
-  "projectName": "amkyaw-tts",
   "builds": [
     {
       "src": "api/**/*.js",
