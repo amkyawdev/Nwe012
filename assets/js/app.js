@@ -253,8 +253,8 @@ function setupGenerateButton() {
             }
 
             if (data.success && data.audio) {
-                // Show audio player
-                showAudioPlayer(data.audio, data.format, text);
+                // Show audio player with mimeType
+                showAudioPlayer(data.audio, data.format, text, data.mimeType);
                 
                 // Update usage
                 state.usageUsed += text.length;
@@ -291,11 +291,21 @@ function setupGenerateButton() {
 // ===== Audio Player =====
 let currentAudioData = null;
 
-function showAudioPlayer(audioData, format, text) {
+function showAudioPlayer(audioData, format, text, mimeType) {
     // Remove existing player
     const existingPlayer = document.querySelector('.audio-player');
     if (existingPlayer) {
         existingPlayer.remove();
+    }
+
+    // Determine display format
+    let displayFormat = format || 'WAV';
+    let downloadExt = format || 'wav';
+    
+    // Handle PCM format - display as WAV
+    if (mimeType && mimeType.includes('L16')) {
+        displayFormat = 'WAV';
+        downloadExt = 'wav';
     }
 
     // Create audio player element
@@ -305,31 +315,23 @@ function showAudioPlayer(audioData, format, text) {
         <div class="audio-player-content">
             <div class="audio-header">
                 <span class="audio-title">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M9 18V5l12-2v13"/>
-                        <circle cx="6" cy="18" r="3"/>
-                        <circle cx="18" cy="16" r="3"/>
-                    </svg>
+                    <i data-lucide="music"></i>
                     Generated Audio
                 </span>
                 <button class="audio-close" onclick="closeAudioPlayer()">×</button>
             </div>
             <div class="audio-info">
-                <span class="audio-badge">${format.toUpperCase()}</span>
+                <span class="audio-badge">${displayFormat}</span>
                 <span class="audio-chars">${text.length} characters</span>
             </div>
             <audio controls id="generatedAudio">
-                <source src="${audioData}" type="audio/${format}">
+                <source src="${audioData}" type="${mimeType || 'audio/wav'}">
                 Your browser does not support audio playback.
             </audio>
             <div class="audio-actions">
-                <button class="btn btn-primary btn-download" onclick="downloadAudio('${audioData}', '${format}')">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                        <polyline points="7 10 12 15 17 10"/>
-                        <line x1="12" x2="12" y1="15" y2="3"/>
-                    </svg>
-                    Download ${format.toUpperCase()}
+                <button class="btn btn-primary btn-download" onclick="downloadAudio('${audioData}', '${downloadExt}', '${mimeType}')">
+                    <i data-lucide="download"></i>
+                    Download ${displayFormat}
                 </button>
             </div>
         </div>
@@ -341,12 +343,17 @@ function showAudioPlayer(audioData, format, text) {
         studioCard.parentNode.insertBefore(playerDiv, studioCard.nextSibling);
     }
 
+    // Initialize Lucide icons
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
+
     // Auto play
     const audio = document.getElementById('generatedAudio');
     audio.play().catch(err => console.log('Auto-play blocked:', err));
 
     // Store for download
-    currentAudioData = { audioData, format, text };
+    currentAudioData = { audioData, format: downloadExt, mimeType };
 }
 
 function closeAudioPlayer() {
@@ -357,8 +364,24 @@ function closeAudioPlayer() {
     currentAudioData = null;
 }
 
-function downloadAudio(audioData, format) {
+function downloadAudio(audioData, format, mimeType) {
     if (!audioData) return;
+
+    // Use correct MIME type for download
+    let downloadMimeType = mimeType || 'audio/wav';
+    let downloadExt = format || 'wav';
+    
+    // Handle PCM format - save as WAV
+    if (mimeType && mimeType.includes('L16')) {
+        downloadMimeType = 'audio/wav';
+        downloadExt = 'wav';
+    } else if (mimeType && mimeType.includes('mp3')) {
+        downloadMimeType = 'audio/mpeg';
+        downloadExt = 'mp3';
+    } else if (mimeType && mimeType.includes('webm')) {
+        downloadMimeType = 'audio/webm';
+        downloadExt = 'webm';
+    }
 
     // Convert base64 to blob
     const byteCharacters = atob(audioData.split(',')[1]);
@@ -367,12 +390,12 @@ function downloadAudio(audioData, format) {
         byteNumbers[i] = byteCharacters.charCodeAt(i);
     }
     const byteArray = new Uint8Array(byteNumbers);
-    const blob = new Blob([byteArray], { type: `audio/${format}` });
+    const blob = new Blob([byteArray], { type: downloadMimeType });
 
     // Create download link
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
-    link.download = `myanmar-tts-${Date.now()}.${format}`;
+    link.download = `myanmar-tts-${Date.now()}.${downloadExt}`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
