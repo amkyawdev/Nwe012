@@ -408,9 +408,9 @@
             <div class="api-container">
                 <div class="api-card animate-card">
                     <div class="api-input-group">
-                        <label for="apiKey">OpenAI API Key</label>
+                        <label for="apiKey">Gemini API Key</label>
                         <div class="input-wrapper">
-                            <input type="password" id="apiKey" placeholder="sk-... ထည့်သွင်းပါ...">
+                            <input type="password" id="apiKey" placeholder="AIza... ထည့်သွင်းပါ...">
                             <button class="btn-toggle-visibility" id="toggleVisibility">
                                 <svg class="eye-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
@@ -748,44 +748,37 @@ Timecode format: HH:MM:SS,mmm</pre>
                                 <polyline points="22 4 12 14.01 9 11.01"/>
                             </svg>
                             <div>
-                                <strong>OpenAI TTS</strong>
-                                <p>API Key ထည့်ရုံနဲ့ အလုပ်လုပ်ပါပြီ - Google Cloud Console မလိုပါဘူး</p>
+                                <strong>Gemini TTS</strong>
+                                <p>Gemini API Key ထည့်ရုံနဲ့ TTS အလုပ်လုပ်ပါပြီ</p>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Pricing Info -->
+                <!-- Voice Options -->
                 <div class="docs-card animate-card">
                     <h2 class="docs-title">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <line x1="12" y1="1" x2="12" y2="23"/>
-                            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                            <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/>
+                            <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
                         </svg>
-                        Pricing / စျေးနှုန်း
+                        Voice Options / အသံရွေးချယ်စရာများ
                     </h2>
                     <div class="docs-content">
-                        <div class="pricing-table">
-                            <div class="pricing-item">
-                                <div class="pricing-header">
-                                    <span class="pricing-name">Free Trial</span>
-                                    <span class="pricing-price">$5 FREE</span>
+                        <div class="voice-options-list">
+                            <div class="voice-option-item">
+                                <div class="voice-icon male">🎙️</div>
+                                <div class="voice-info">
+                                    <strong>သီဟ (Puck)</strong>
+                                    <span>ကျားအသံ - Natural male voice</span>
                                 </div>
-                                <p>OpenAI signup လုပ်ရင် $5 credit အခမဲ့ရ</p>
                             </div>
-                            <div class="pricing-item">
-                                <div class="pricing-header">
-                                    <span class="pricing-name">TTS-1 Model</span>
-                                    <span class="pricing-price">$0.015 / 1K chars</span>
+                            <div class="voice-option-item">
+                                <div class="voice-icon female">🎤</div>
+                                <div class="voice-info">
+                                    <strong>နီလာ (Charon)</strong>
+                                    <span>မိန်းမအသံ - Natural female voice</span>
                                 </div>
-                                <p>1,000 စာလုံးအတွက် $0.015</p>
-                            </div>
-                            <div class="pricing-item">
-                                <div class="pricing-header">
-                                    <span class="pricing-name">TTS-1 HD Model</span>
-                                    <span class="pricing-price">$0.030 / 1K chars</span>
-                                </div>
-                                <p>HD Quality - 1,000 စာလုံးအတွက် $0.030</p>
                             </div>
                         </div>
                         
@@ -796,8 +789,8 @@ Timecode format: HH:MM:SS,mmm</pre>
                                 <line x1="12" y1="8" x2="12.01" y2="8"/>
                             </svg>
                             <div>
-                                <strong>Budget Friendly</strong>
-                                <p>$5 trial နဲ့ စာလုံး 300,000+ အသုံးပြုနိုင်ပါသည်</p>
+                                <strong>Real-time TTS</strong>
+                                <p>Gemini TTS models များသည် fast နှင့် natural ဖြစ်ပါသည်</p>
                             </div>
                         </div>
                     </div>

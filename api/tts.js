@@ -15,7 +15,7 @@ module.exports = async (req, res) => {
   }
 
   try {
-    const { text, voice, format } = req.body;
+    const { text, voice } = req.body;
 
     if (!text) {
       return res.status(400).json({ error: 'Text is required' });
@@ -27,35 +27,48 @@ module.exports = async (req, res) => {
     if (!apiKey) {
       return res.status(400).json({ 
         error: 'API key required',
-        message: 'Please provide your OpenAI API Key'
+        message: 'Please provide your Gemini API Key'
       });
     }
 
-    // Voice mapping for OpenAI TTS
+    // Voice mapping for Gemini TTS
     const voiceMap = {
-      'thiha': 'alloy',      // Male voice
-      'nayliya': 'nova',     // Female voice
-      'default': 'alloy'
+      'thiha': 'Puck',        // Male voice
+      'nayliya': 'Charon',    // Female voice
+      'default': 'Puck'
     };
 
     const selectedVoice = voiceMap[voice] || voiceMap.default;
-    const audioFormat = format === 'wav' ? 'wav' : 'mp3';
+    const outputAudioFormat = 'MP3'; // Gemini outputs MP3
 
-    // Use OpenAI TTS API
-    const ttsUrl = 'https://api.openai.com/v1/audio/speech';
+    // Use Gemini TTS API
+    const model = 'gemini-2.0-flash-exp';
+    const ttsUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+
+    const ttsRequest = {
+      contents: [{
+        parts: [{
+          text: text
+        }]
+      }],
+      generationConfig: {
+        responseModalities: ["AUDIO"],
+        audioConfig: {
+          voiceConfig: {
+            prebuiltVoiceConfig: {
+              voiceName: selectedVoice
+            }
+          }
+        }
+      }
+    };
 
     const ttsResponse = await fetch(ttsUrl, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`
+        'Content-Type': 'application/json'
       },
-      body: JSON.stringify({
-        model: 'tts-1',
-        voice: selectedVoice,
-        input: text,
-        response_format: audioFormat
-      })
+      body: JSON.stringify(ttsRequest)
     });
 
     if (!ttsResponse.ok) {
@@ -63,15 +76,19 @@ module.exports = async (req, res) => {
       throw new Error(errorData.error?.message || 'TTS API request failed');
     }
 
-    // Get audio buffer
-    const audioBuffer = await ttsResponse.arrayBuffer();
-    const base64Audio = Buffer.from(audioBuffer).toString('base64');
-    const mimeType = audioFormat === 'wav' ? 'audio/wav' : 'audio/mpeg';
+    const ttsData = await ttsResponse.json();
+    
+    // Extract audio from response
+    const audioBase64 = ttsData?.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
+
+    if (!audioBase64) {
+      throw new Error('No audio generated from Gemini API');
+    }
 
     return res.status(200).json({
       success: true,
-      audio: `data:${mimeType};base64,${base64Audio}`,
-      format: audioFormat,
+      audio: `data:audio/mp3;base64,${audioBase64}`,
+      format: 'mp3',
       voice: selectedVoice,
       charCount: text.length
     });
