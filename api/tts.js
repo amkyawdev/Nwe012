@@ -88,21 +88,30 @@ module.exports = async (req, res) => {
 
     // Determine format from mimeType
     let format = 'wav';
+    let finalMimeType = 'audio/wav';
+    let finalAudioBase64 = audioBase64;
+
     if (audioMimeType.includes('mp3') || audioMimeType.includes('mpeg')) {
       format = 'mp3';
+      finalMimeType = 'audio/mpeg';
     } else if (audioMimeType.includes('webm')) {
       format = 'webm';
+      finalMimeType = 'audio/webm';
+    } else if (audioMimeType.includes('L16') || audioMimeType.includes('pcm')) {
+      // Convert PCM to WAV with proper headers
+      format = 'wav';
+      finalMimeType = 'audio/wav';
+      finalAudioBase64 = convertPCMToWav(audioBase64, 24000, 1, 16);
     }
 
     return res.status(200).json({
       success: true,
-      audio: `data:${audioMimeType};base64,${audioBase64}`,
+      audio: `data:${finalMimeType};base64,${finalAudioBase64}`,
       format: format,
-      mimeType: audioMimeType,
+      mimeType: finalMimeType,
       voice: selectedVoice,
       charCount: text.length
     });
-
   } catch (error) {
     console.error('TTS Error:', error);
     return res.status(500).json({ 
@@ -111,3 +120,38 @@ module.exports = async (req, res) => {
     });
   }
 };
+
+// Helper function to convert PCM to WAV format
+function convertPCMToWav(pcmBase64, sampleRate, numChannels, bitsPerSample) {
+  // Decode base64 to buffer
+  const pcmBuffer = Buffer.from(pcmBase64, 'base64');
+  const dataSize = pcmBuffer.length;
+  const fileSize = 44 + dataSize;
+
+  // Create WAV header
+  const wavHeader = Buffer.alloc(44);
+  
+  // RIFF chunk descriptor
+  wavHeader.write('RIFF', 0);
+  wavHeader.writeUInt32LE(fileSize - 8, 4);  // File size - 8
+  wavHeader.write('WAVE', 8);
+  
+  // fmt sub-chunk
+  wavHeader.write('fmt ', 12);
+  wavHeader.writeUInt32LE(16, 16);           // Subchunk1Size (16 for PCM)
+  wavHeader.writeUInt16LE(1, 20);             // AudioFormat (1 = PCM)
+  wavHeader.writeUInt16LE(numChannels, 22);    // NumChannels
+  wavHeader.writeUInt32LE(sampleRate, 24);     // SampleRate
+  wavHeader.writeUInt32LE(sampleRate * numChannels * bitsPerSample / 8, 28);  // ByteRate
+  wavHeader.writeUInt16LE(numChannels * bitsPerSample / 8, 32);  // BlockAlign
+  wavHeader.writeUInt16LE(bitsPerSample, 34); // BitsPerSample
+  
+  // data sub-chunk
+  wavHeader.write('data', 36);
+  wavHeader.writeUInt32LE(dataSize, 40);     // Subchunk2Size
+
+  // Combine header and PCM data
+  const wavBuffer = Buffer.concat([wavHeader, pcmBuffer]);
+  
+  return wavBuffer.toString('base64');
+}
