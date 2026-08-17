@@ -202,6 +202,9 @@ function setupTextInput() {
     });
 }
 
+// ===== API Configuration =====
+const API_BASE = ''; // Empty for same-origin, or set to your API URL
+
 // ===== Generate Button =====
 function setupGenerateButton() {
     elements.generateBtn.addEventListener('click', async () => {
@@ -209,12 +212,6 @@ function setupGenerateButton() {
         
         if (!text) {
             showToast('စာသား ထည့်သွင်းပါ', 'warning');
-            return;
-        }
-
-        if (!state.apiKey) {
-            showToast('API Key ထည့်သွင်းပါ', 'warning');
-            navigateToPage('api');
             return;
         }
 
@@ -227,41 +224,60 @@ function setupGenerateButton() {
         elements.generateBtn.classList.add('loading');
         elements.generateBtn.disabled = true;
 
-        // Simulate API call (replace with actual TTS API)
         try {
-            await simulateTTS(text);
+            const response = await fetch(`${API_BASE}/api/tts`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    text: text,
+                    voice: state.selectedVoice,
+                    speed: 'normal'
+                })
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.message || 'API request failed');
+            }
+
+            const data = await response.json();
             
-            // Update usage
-            state.usageUsed += text.length;
-            if (state.currentMode === 'tts') {
-                state.ttsCount++;
+            if (data.success && data.audio) {
+                // Play the audio
+                const audio = new Audio(data.audio);
+                await audio.play();
+                
+                // Update usage
+                state.usageUsed += text.length;
+                if (state.currentMode === 'tts') {
+                    state.ttsCount++;
+                } else {
+                    state.srtCount++;
+                }
+                
+                saveState();
+                updateUsageDisplay();
+                
+                showToast('အသံဖန်တီးပြီးပါပြီ! 🎉', 'success');
+                
+                // Clear input
+                elements.textInput.value = '';
+                state.charCount = 0;
+                elements.charCount.textContent = '0';
+                elements.charCount.style.color = 'var(--text-muted)';
             } else {
-                state.srtCount++;
+                throw new Error('Invalid response from server');
             }
             
-            saveState();
-            updateUsageDisplay();
-            
-            showToast('အသံဖန်တီးပြီးပါပြီ!', 'success');
-            
-            // Clear input
-            elements.textInput.value = '';
-            state.charCount = 0;
-            elements.charCount.textContent = '0';
-            elements.charCount.style.color = 'var(--text-muted)';
-            
         } catch (error) {
+            console.error('TTS Error:', error);
             showToast('အမှားဖြစ်ပွားသည်: ' + error.message, 'error');
         } finally {
             elements.generateBtn.classList.remove('loading');
             elements.generateBtn.disabled = false;
         }
-    });
-}
-
-function simulateTTS(text) {
-    return new Promise((resolve) => {
-        setTimeout(resolve, 2000);
     });
 }
 
