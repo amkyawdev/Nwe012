@@ -15,62 +15,47 @@ module.exports = async (req, res) => {
   }
 
   try {
-    const { text, voice, format, apiType } = req.body;
+    const { text, voice, format } = req.body;
 
     if (!text) {
       return res.status(400).json({ error: 'Text is required' });
     }
 
-    // Voice mapping
-    const voiceMap = {
-      'thiha': { langCode: 'my-MM', name: 'my-MM-Standard-A', gender: 'MALE' },
-      'nayliya': { langCode: 'my-MM', name: 'my-MM-Standard-A', gender: 'FEMALE' },
-      'default': { langCode: 'my-MM', name: 'my-MM-Standard-A', gender: 'FEMALE' }
-    };
-
-    const selectedVoice = voiceMap[voice] || voiceMap.default;
-    const audioFormat = format === 'wav' ? 'LINEAR16' : 'MP3';
-
-    // API Type selection: 'gemini' or 'aistudio'
-    const selectedApiType = apiType || 'gemini';
-
-    // Get API key based on selected type
-    let apiKey = '';
-    
-    if (selectedApiType === 'aistudio') {
-      apiKey = process.env.AISTUDIO_API_KEY || req.body.apiKey;
-    } else {
-      apiKey = process.env.GEMINI_API_KEY || req.body.apiKey;
-    }
+    // Get API key from request body
+    const apiKey = req.body.apiKey;
 
     if (!apiKey) {
       return res.status(400).json({ 
         error: 'API key required',
-        message: `Please provide your ${selectedApiType === 'aistudio' ? 'Ai Studio' : 'Gemini'} API Key`
+        message: 'Please provide your OpenAI API Key'
       });
     }
 
-    // Use Google Cloud TTS API
-    const ttsUrl = `https://texttospeech.googleapis.com/v1/text:synthesize?key=${apiKey}`;
-
-    const ttsRequest = {
-      input: { text: text },
-      voice: {
-        languageCode: selectedVoice.langCode,
-        name: selectedVoice.name,
-      },
-      audioConfig: {
-        audioEncoding: audioFormat,
-        speakingRate: 0.95,
-        pitch: 0,
-        sampleRateHertz: 24000,
-      },
+    // Voice mapping for OpenAI TTS
+    const voiceMap = {
+      'thiha': 'alloy',      // Male voice
+      'nayliya': 'nova',     // Female voice
+      'default': 'alloy'
     };
+
+    const selectedVoice = voiceMap[voice] || voiceMap.default;
+    const audioFormat = format === 'wav' ? 'wav' : 'mp3';
+
+    // Use OpenAI TTS API
+    const ttsUrl = 'https://api.openai.com/v1/audio/speech';
 
     const ttsResponse = await fetch(ttsUrl, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(ttsRequest)
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`
+      },
+      body: JSON.stringify({
+        model: 'tts-1',
+        voice: selectedVoice,
+        input: text,
+        response_format: audioFormat
+      })
     });
 
     if (!ttsResponse.ok) {
@@ -78,14 +63,16 @@ module.exports = async (req, res) => {
       throw new Error(errorData.error?.message || 'TTS API request failed');
     }
 
-    const ttsData = await ttsResponse.json();
-    const mimeType = audioFormat === 'MP3' ? 'audio/mpeg' : 'audio/wav';
+    // Get audio buffer
+    const audioBuffer = await ttsResponse.arrayBuffer();
+    const base64Audio = Buffer.from(audioBuffer).toString('base64');
+    const mimeType = audioFormat === 'wav' ? 'audio/wav' : 'audio/mpeg';
 
     return res.status(200).json({
       success: true,
-      audio: `data:${mimeType};base64,${ttsData.audioContent}`,
-      format: audioFormat === 'MP3' ? 'mp3' : 'wav',
-      voice: selectedVoice.name,
+      audio: `data:${mimeType};base64,${base64Audio}`,
+      format: audioFormat,
+      voice: selectedVoice,
       charCount: text.length
     });
 

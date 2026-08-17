@@ -3,7 +3,6 @@ const state = {
     currentPage: 'home',
     currentMode: 'tts',
     selectedVoice: 'thiha',
-    selectedApiType: localStorage.getItem('amkyaw_tts_api_type') || 'gemini',
     selectedFormat: localStorage.getItem('amkyaw_tts_format') || 'mp3',
     charCount: 0,
     usageUsed: 0,
@@ -277,8 +276,7 @@ function setupGenerateButton() {
                     text: text,
                     voice: state.selectedVoice,
                     format: state.selectedFormat,
-                    apiKey: apiKey,
-                    apiType: state.selectedApiType
+                    apiKey: apiKey
                 })
             });
 
@@ -427,15 +425,6 @@ function setupApiKey() {
         elements.apiKeyInput.value = state.apiKey;
     }
 
-    // Load saved API type
-    const savedApiType = localStorage.getItem('amkyaw_tts_api_type') || 'gemini';
-    const apiTypeInputs = document.querySelectorAll('input[name="apiType"]');
-    apiTypeInputs.forEach(input => {
-        if (input.value === savedApiType) {
-            input.checked = true;
-        }
-    });
-
     // Toggle visibility
     elements.toggleVisibility.addEventListener('click', () => {
         const type = elements.apiKeyInput.type === 'password' ? 'text' : 'password';
@@ -446,14 +435,6 @@ function setupApiKey() {
         
         eyeOpen.classList.toggle('hidden');
         eyeClosed.classList.toggle('hidden');
-    });
-
-    // API Type selection
-    apiTypeInputs.forEach(input => {
-        input.addEventListener('change', () => {
-            state.selectedApiType = input.value;
-            localStorage.setItem('amkyaw_tts_api_type', input.value);
-        });
     });
 
     // Save API key

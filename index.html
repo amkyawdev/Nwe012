@@ -408,29 +408,9 @@
             <div class="api-container">
                 <div class="api-card animate-card">
                     <div class="api-input-group">
-                        <label>API Type</label>
-                        <div class="api-type-selector">
-                            <label class="api-type-option">
-                                <input type="radio" name="apiType" value="gemini" checked>
-                                <span class="api-type-label">
-                                    <span class="api-type-name">Gemini</span>
-                                    <span class="api-type-desc">Google Gemini API</span>
-                                </span>
-                            </label>
-                            <label class="api-type-option">
-                                <input type="radio" name="apiType" value="aistudio">
-                                <span class="api-type-label">
-                                    <span class="api-type-name">AI Studio</span>
-                                    <span class="api-type-desc">Google AI Studio</span>
-                                </span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <div class="api-input-group">
-                        <label for="apiKey">API Key</label>
+                        <label for="apiKey">OpenAI API Key</label>
                         <div class="input-wrapper">
-                            <input type="password" id="apiKey" placeholder="API Key ထည့်သွင်းပါ...">
+                            <input type="password" id="apiKey" placeholder="sk-... ထည့်သွင်းပါ...">
                             <button class="btn-toggle-visibility" id="toggleVisibility">
                                 <svg class="eye-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
@@ -762,6 +742,53 @@ Timecode format: HH:MM:SS,mmm</pre>
                             </div>
                         </div>
 
+                        <div class="note-box note-success">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                                <polyline points="22 4 12 14.01 9 11.01"/>
+                            </svg>
+                            <div>
+                                <strong>OpenAI TTS</strong>
+                                <p>API Key ထည့်ရုံနဲ့ အလုပ်လုပ်ပါပြီ - Google Cloud Console မလိုပါဘူး</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pricing Info -->
+                <div class="docs-card animate-card">
+                    <h2 class="docs-title">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="12" y1="1" x2="12" y2="23"/>
+                            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                        </svg>
+                        Pricing / စျေးနှုန်း
+                    </h2>
+                    <div class="docs-content">
+                        <div class="pricing-table">
+                            <div class="pricing-item">
+                                <div class="pricing-header">
+                                    <span class="pricing-name">Free Trial</span>
+                                    <span class="pricing-price">$5 FREE</span>
+                                </div>
+                                <p>OpenAI signup လုပ်ရင် $5 credit အခမဲ့ရ</p>
+                            </div>
+                            <div class="pricing-item">
+                                <div class="pricing-header">
+                                    <span class="pricing-name">TTS-1 Model</span>
+                                    <span class="pricing-price">$0.015 / 1K chars</span>
+                                </div>
+                                <p>1,000 စာလုံးအတွက် $0.015</p>
+                            </div>
+                            <div class="pricing-item">
+                                <div class="pricing-header">
+                                    <span class="pricing-name">TTS-1 HD Model</span>
+                                    <span class="pricing-price">$0.030 / 1K chars</span>
+                                </div>
+                                <p>HD Quality - 1,000 စာလုံးအတွက် $0.030</p>
+                            </div>
+                        </div>
+                        
                         <div class="note-box note-info">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <circle cx="12" cy="12" r="10"/>
@@ -769,73 +796,8 @@ Timecode format: HH:MM:SS,mmm</pre>
                                 <line x1="12" y1="8" x2="12.01" y2="8"/>
                             </svg>
                             <div>
-                                <strong>API Type</strong>
-                                <p>Gemini (default) သို့မဟုတ် AI Studio ကိုရွေးချယ်နိုင်ပါသည်</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Google Cloud Setup -->
-                <div class="docs-card animate-card">
-                    <h2 class="docs-title">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
-                        </svg>
-                        Google Cloud TTS API ဖွင့်နည်း
-                    </h2>
-                    <div class="docs-content">
-                        <div class="alert-box alert-warning">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
-                                <line x1="12" y1="9" x2="12" y2="13"/>
-                                <line x1="12" y1="17" x2="12.01" y2="17"/>
-                            </svg>
-                            <div>
-                                <strong>Important!</strong>
-                                <p>API Key သုံးမယ်ဆိုရင် Google Cloud Console မှာ TTS API ကို enable လုပ်ဖို့လိုပါသည်</p>
-                            </div>
-                        </div>
-
-                        <div class="step-guide">
-                            <div class="step">
-                                <span class="step-num">1</span>
-                                <div class="step-content">
-                                    <h4>Google Cloud Console သို့သွားပါ</h4>
-                                    <p><a href="https://console.cloud.google.com" target="_blank">https://console.cloud.google.com</a> မှာ login ဝင်ပါ</p>
-                                </div>
-                            </div>
-                            <div class="step">
-                                <span class="step-num">2</span>
-                                <div class="step-content">
-                                    <h4>Project ရွေးပါ</h4>
-                                    <p>API Key နဲ့ချိတ်ဆက်ထားတဲ့ Project ကို select လုပ်ပါ</p>
-                                </div>
-                            </div>
-                            <div class="step">
-                                <span class="step-num">3</span>
-                                <div class="step-content">
-                                    <h4>Text-to-Speech API ကို Enable လုပ်ပါ</h4>
-                                    <p><a href="https://console.cloud.google.com/apis/library/texttospeech.googleapis.com" target="_blank">ဤလင့်ခ်</a> မှာ Enable နှိပ်ပါ</p>
-                                </div>
-                            </div>
-                            <div class="step">
-                                <span class="step-num">4</span>
-                                <div class="step-content">
-                                    <h4>စမ်းသပ်ပါ</h4>
-                                    <p>၂-၃ မိနစ်စောင့်ပြီး App မှာ စမ်းသပ်ပါ</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="note-box note-success">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-                                <polyline points="22 4 12 14.01 9 11.01"/>
-                            </svg>
-                            <div>
-                                <strong>Free Trial</strong>
-                                <p>Google Cloud မှာ $300 credit အခမဲ့ရနိုင်ပါသည်</p>
+                                <strong>Budget Friendly</strong>
+                                <p>$5 trial နဲ့ စာလုံး 300,000+ အသုံးပြုနိုင်ပါသည်</p>
                             </div>
                         </div>
                     </div>

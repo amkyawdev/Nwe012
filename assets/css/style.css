@@ -1342,57 +1342,6 @@ a:hover {
     color: var(--text-primary);
 }
 
-.api-type-selector {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0.75rem;
-    margin-bottom: 0.5rem;
-}
-
-.api-type-option {
-    position: relative;
-    cursor: pointer;
-}
-
-.api-type-option input {
-    position: absolute;
-    opacity: 0;
-    width: 0;
-    height: 0;
-}
-
-.api-type-label {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 1rem;
-    background: var(--surface-elevated);
-    border: 2px solid var(--border);
-    border-radius: var(--radius-md);
-    transition: all var(--transition-fast);
-}
-
-.api-type-option:hover .api-type-label {
-    border-color: var(--primary-light);
-}
-
-.api-type-option input:checked + .api-type-label {
-    border-color: var(--primary);
-    background: rgba(255, 107, 53, 0.1);
-}
-
-.api-type-name {
-    font-weight: 600;
-    font-size: 1rem;
-    color: var(--text-primary);
-}
-
-.api-type-desc {
-    font-size: 0.75rem;
-    color: var(--text-muted);
-    margin-top: 0.25rem;
-}
-
 .input-wrapper {
     position: relative;
     display: flex;
@@ -1814,6 +1763,45 @@ a:hover {
     color: var(--text-muted);
     font-style: italic;
     margin: 0;
+}
+
+/* ===== Pricing Table ===== */
+.pricing-table {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.pricing-item {
+    padding: 1rem;
+    background: var(--surface-elevated);
+    border-radius: var(--radius-md);
+    border-left: 4px solid var(--primary);
+}
+
+.pricing-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.pricing-name {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.pricing-price {
+    font-weight: 700;
+    color: var(--primary);
+    font-size: 0.9rem;
+}
+
+.pricing-item p {
+    margin: 0;
+    font-size: 0.85rem;
+    color: var(--text-muted);
 }
 
 /* ===== Usage Page ===== */
