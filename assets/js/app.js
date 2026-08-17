@@ -228,9 +228,11 @@ function setupGenerateButton() {
             return;
         }
 
-        // Show loading state
-        elements.generateBtn.classList.add('loading');
-        elements.generateBtn.disabled = true;
+        // Calculate estimated time (min 5s, max 15s, ~1s per 10 chars)
+        const estimatedSeconds = Math.min(15, Math.max(5, Math.ceil(text.length / 10))
+        
+        // Show loading overlay
+        showLoadingOverlay(estimatedSeconds);
 
         try {
             // Call API with API key
@@ -253,6 +255,9 @@ function setupGenerateButton() {
             }
 
             if (data.success && data.audio) {
+                // Hide loading overlay
+                hideLoadingOverlay();
+                
                 // Show audio player with mimeType
                 showAudioPlayer(data.audio, data.format, text, data.mimeType);
                 
@@ -280,12 +285,120 @@ function setupGenerateButton() {
             
         } catch (error) {
             console.error('TTS Error:', error);
+            hideLoadingOverlay();
             showToast('အမှားဖြစ်ပွားသည်: ' + error.message, 'error');
-        } finally {
-            elements.generateBtn.classList.remove('loading');
-            elements.generateBtn.disabled = false;
         }
     });
+}
+
+// ===== Loading Overlay =====
+let loadingInterval = null;
+
+function showLoadingOverlay(estimatedSeconds) {
+    // Remove existing overlay
+    hideLoadingOverlay();
+    
+    // Create overlay
+    const overlay = document.createElement('div');
+    overlay.id = 'loadingOverlay';
+    overlay.innerHTML = `
+        <div class="loading-content">
+            <div class="loading-animation">
+                <div class="script-container">
+                    <span class="script-char">A</span>
+                    <span class="script-char">I</span>
+                    <span class="script-char">-</span>
+                    <span class="script-char">G</span>
+                    <span class="script-char">e</span>
+                    <span class="script-char">n</span>
+                    <span class="script-char">e</span>
+                    <span class="script-char">r</span>
+                    <span class="script-char">a</span>
+                    <span class="script-char">t</span>
+                    <span class="script-char">i</span>
+                    <span class="script-char">n</span>
+                    <span class="script-char">g</span>
+                    <span class="script-char">.</span>
+                    <span class="script-cursor">|</span>
+                </div>
+            </div>
+            <div class="loading-progress">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div class="progress-info">
+                    <span class="progress-percent" id="progressPercent">0%</span>
+                    <span class="progress-time" id="progressTime">~${estimatedSeconds}s</span>
+                </div>
+            </div>
+            <p class="loading-text">အသံဖန်တီးနေသည်...</p>
+        </div>
+    `;
+    document.body.appendChild(overlay);
+    
+    // Animate script typing
+    animateScript();
+    
+    // Progress animation (simulated based on time)
+    let progress = 0;
+    const duration = estimatedSeconds * 1000;
+    const interval = 100;
+    const increment = (100 / (duration / interval));
+    
+    loadingInterval = setInterval(() => {
+        progress += increment;
+        if (progress > 95) progress = 95; // Max 95% until complete
+        
+        const progressFill = document.getElementById('progressFill');
+        const progressPercent = document.getElementById('progressPercent');
+        
+        if (progressFill) progressFill.style.width = `${progress}%`;
+        if (progressPercent) progressPercent.textContent = `${Math.round(progress)}%`;
+    }, interval);
+}
+
+function animateScript() {
+    const chars = document.querySelectorAll('.script-char');
+    const cursor = document.querySelector('.script-cursor');
+    let charIndex = 0;
+    let show = true;
+    
+    // Initially hide all chars
+    chars.forEach(char => char.style.opacity = '0');
+    
+    // Cursor blink
+    const cursorInterval = setInterval(() => {
+        if (cursor) {
+            cursor.style.opacity = show ? '1' : '0';
+            show = !show;
+        }
+    }, 500);
+    
+    // Type characters
+    const typeInterval = setInterval(() => {
+        if (charIndex < chars.length) {
+            chars[charIndex].style.opacity = '1';
+            chars[charIndex].style.transform = 'translateY(0)';
+            charIndex++;
+        } else {
+            clearInterval(typeInterval);
+            clearInterval(cursorInterval);
+        }
+    }, 100);
+}
+
+function hideLoadingOverlay() {
+    if (loadingInterval) {
+        clearInterval(loadingInterval);
+        loadingInterval = null;
+    }
+    
+    const overlay = document.getElementById('loadingOverlay');
+    if (overlay) {
+        overlay.style.opacity = '0';
+        overlay.style.transform = 'scale(0.9)';
+        setTimeout(() => overlay.remove(), 300);
+    }
 }
 
 // ===== Audio Player =====
