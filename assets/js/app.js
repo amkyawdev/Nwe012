@@ -324,10 +324,40 @@ function showAudioPlayer(audioData, format, text, mimeType) {
                 <span class="audio-badge">${displayFormat}</span>
                 <span class="audio-chars">${text.length} characters</span>
             </div>
-            <audio controls id="generatedAudio">
+            
+            <div class="audio-visualizer" id="audioVisualizer">
+                <div class="wave-bar"></div>
+                <div class="wave-bar"></div>
+                <div class="wave-bar"></div>
+                <div class="wave-bar"></div>
+                <div class="wave-bar"></div>
+                <div class="wave-bar"></div>
+                <div class="wave-bar"></div>
+                <div class="wave-bar"></div>
+            </div>
+            
+            <div class="audio-controls">
+                <button class="audio-btn play-btn" id="playBtn" onclick="togglePlay()">
+                    <i data-lucide="play"></i>
+                </button>
+                <div class="audio-progress-container">
+                    <input type="range" class="audio-progress" id="audioProgress" value="0" min="0" max="100">
+                    <div class="time-display">
+                        <span id="currentTime">0:00</span>
+                        <span id="duration">0:00</span>
+                    </div>
+                </div>
+                <div class="volume-control">
+                    <i data-lucide="volume-2" id="volumeIcon"></i>
+                    <input type="range" class="volume-slider" id="volumeSlider" value="100" min="0" max="100">
+                </div>
+            </div>
+            
+            <audio id="generatedAudio" preload="metadata">
                 <source src="${audioData}" type="${mimeType || 'audio/wav'}">
                 Your browser does not support audio playback.
             </audio>
+            
             <div class="audio-actions">
                 <button class="btn btn-primary btn-download" onclick="downloadAudio('${audioData}', '${downloadExt}', '${mimeType}')">
                     <i data-lucide="download"></i>
@@ -348,12 +378,129 @@ function showAudioPlayer(audioData, format, text, mimeType) {
         lucide.createIcons();
     }
 
-    // Auto play
-    const audio = document.getElementById('generatedAudio');
-    audio.play().catch(err => console.log('Auto-play blocked:', err));
+    // Setup audio controls
+    setupAudioControls();
 
     // Store for download
     currentAudioData = { audioData, format: downloadExt, mimeType };
+}
+
+function setupAudioControls() {
+    const audio = document.getElementById('generatedAudio');
+    const playBtn = document.getElementById('playBtn');
+    const progress = document.getElementById('audioProgress');
+    const currentTimeEl = document.getElementById('currentTime');
+    const durationEl = document.getElementById('duration');
+    const volumeSlider = document.getElementById('volumeSlider');
+    const visualizer = document.getElementById('audioVisualizer');
+    
+    if (!audio || !playBtn) return;
+
+    // Update duration when metadata loads
+    audio.addEventListener('loadedmetadata', () => {
+        durationEl.textContent = formatTime(audio.duration);
+    });
+
+    // Update progress bar
+    audio.addEventListener('timeupdate', () => {
+        const percent = (audio.currentTime / audio.duration) * 100;
+        progress.value = percent || 0;
+        currentTimeEl.textContent = formatTime(audio.currentTime);
+        
+        // Animate visualizer
+        animateVisualizer(visualizer, audio.paused);
+    });
+
+    // Play/Pause button
+    playBtn.addEventListener('click', togglePlay);
+
+    // Progress bar click
+    progress.addEventListener('input', (e) => {
+        const percent = e.target.value;
+        audio.currentTime = (percent / 100) * audio.duration;
+    });
+
+    // Volume control
+    volumeSlider.addEventListener('input', (e) => {
+        audio.volume = e.target.value / 100;
+        updateVolumeIcon(e.target.value);
+    });
+
+    // When audio ends
+    audio.addEventListener('ended', () => {
+        playBtn.innerHTML = '<i data-lucide="play"></i>';
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+        stopVisualizerAnimation(visualizer);
+    });
+
+    // Error handling
+    audio.addEventListener('error', (e) => {
+        console.error('Audio playback error:', e);
+        showToast('Audio playback error. Please try downloading instead.', 'error');
+    });
+}
+
+function togglePlay() {
+    const audio = document.getElementById('generatedAudio');
+    const playBtn = document.getElementById('playBtn');
+    const visualizer = document.getElementById('audioVisualizer');
+    
+    if (!audio) return;
+
+    if (audio.paused) {
+        audio.play();
+        playBtn.innerHTML = '<i data-lucide="pause"></i>';
+        animateVisualizer(visualizer, false);
+    } else {
+        audio.pause();
+        playBtn.innerHTML = '<i data-lucide="play"></i>';
+        stopVisualizerAnimation(visualizer);
+    }
+    
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+}
+
+function formatTime(seconds) {
+    if (isNaN(seconds)) return '0:00';
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+}
+
+function updateVolumeIcon(value) {
+    const icon = document.getElementById('volumeIcon');
+    if (!icon) return;
+    
+    if (value == 0) {
+        icon.setAttribute('data-lucide', 'volume-x');
+    } else if (value < 50) {
+        icon.setAttribute('data-lucide', 'volume-1');
+    } else {
+        icon.setAttribute('data-lucide', 'volume-2');
+    }
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+}
+
+function animateVisualizer(visualizer, isPaused) {
+    if (!visualizer || isPaused) {
+        stopVisualizerAnimation(visualizer);
+        return;
+    }
+    
+    const bars = visualizer.querySelectorAll('.wave-bar');
+    bars.forEach((bar, i) => {
+        bar.style.animation = `wave ${0.5 + Math.random() * 0.5}s ease-in-out infinite alternate`;
+        bar.style.animationDelay = `${i * 0.1}s`;
+    });
+}
+
+function stopVisualizerAnimation(visualizer) {
+    if (!visualizer) return;
+    const bars = visualizer.querySelectorAll('.wave-bar');
+    bars.forEach(bar => {
+        bar.style.animation = 'none';
+        bar.style.height = '20%';
+    });
 }
 
 function closeAudioPlayer() {

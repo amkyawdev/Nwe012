@@ -2222,8 +2222,15 @@ a:hover {
 }
 
 .audio-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
     font-weight: 600;
     color: var(--text-primary);
+}
+
+.audio-title i {
+    color: var(--primary);
 }
 
 .audio-close {
@@ -2235,6 +2242,11 @@ a:hover {
     padding: 0.25rem 0.5rem;
     border-radius: var(--radius-sm);
     transition: all var(--transition-fast);
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .audio-close:hover {
@@ -2242,15 +2254,168 @@ a:hover {
     background: rgba(239, 68, 68, 0.1);
 }
 
-.audio-player audio {
-    width: 100%;
-    height: 50px;
-    border-radius: var(--radius-md);
+/* Audio Visualizer */
+.audio-visualizer {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 4px;
+    height: 60px;
+    margin: 1rem 0;
+    padding: 0.5rem;
+}
+
+.wave-bar {
+    width: 4px;
+    background: linear-gradient(to top, var(--primary), var(--accent));
+    border-radius: 4px;
+    height: 20%;
+    transition: height 0.1s ease;
+}
+
+@keyframes wave {
+    from {
+        height: 20%;
+    }
+    to {
+        height: 100%;
+    }
+}
+
+/* Audio Controls */
+.audio-controls {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: var(--surface-elevated);
+    border-radius: var(--radius-lg);
     margin-bottom: 1rem;
 }
 
-.audio-player audio::-webkit-media-controls-panel {
-    background: var(--surface-elevated);
+.audio-btn {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: none;
+    background: var(--gradient-1);
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition-normal);
+    flex-shrink: 0;
+}
+
+.audio-btn:hover {
+    transform: scale(1.1);
+    box-shadow: var(--shadow-glow);
+}
+
+.audio-btn i {
+    width: 24px;
+    height: 24px;
+}
+
+.audio-progress-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.audio-progress {
+    width: 100%;
+    height: 6px;
+    -webkit-appearance: none;
+    appearance: none;
+    background: var(--border);
+    border-radius: 3px;
+    outline: none;
+    cursor: pointer;
+}
+
+.audio-progress::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    background: var(--primary);
+    border-radius: 50%;
+    cursor: pointer;
+    transition: transform var(--transition-fast);
+}
+
+.audio-progress::-webkit-slider-thumb:hover {
+    transform: scale(1.2);
+}
+
+.time-display {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.volume-control {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-shrink: 0;
+}
+
+.volume-control i {
+    color: var(--text-secondary);
+    width: 20px;
+    height: 20px;
+}
+
+.volume-slider {
+    width: 80px;
+    height: 4px;
+    -webkit-appearance: none;
+    appearance: none;
+    background: var(--border);
+    border-radius: 2px;
+    outline: none;
+    cursor: pointer;
+}
+
+.volume-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 12px;
+    height: 12px;
+    background: var(--text-secondary);
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+/* Hidden audio element */
+.audio-player audio {
+    display: none;
+}
+
+.audio-info {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.audio-badge {
+    background: var(--gradient-1);
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 50px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.audio-chars {
+    color: var(--text-muted);
+    font-size: 0.75rem;
 }
 
 .audio-actions {
@@ -2270,7 +2435,7 @@ a:hover {
     border-radius: var(--radius-md);
     font-weight: 600;
     cursor: pointer;
-    transition: all var(--transition-fast);
+    transition: all var(--transition-normal);
 }
 
 .btn-download:hover {
@@ -2278,7 +2443,7 @@ a:hover {
     box-shadow: var(--shadow-glow);
 }
 
-.btn-download svg {
+.btn-download i {
     width: 20px;
     height: 20px;
 }
