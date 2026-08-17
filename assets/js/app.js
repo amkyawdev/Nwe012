@@ -229,7 +229,7 @@ function setupGenerateButton() {
         }
 
         // Calculate estimated time (min 5s, max 15s, ~1s per 10 chars)
-        const estimatedSeconds = Math.min(15, Math.max(5, Math.ceil(text.length / 10))
+        const estimatedSeconds = Math.min(15, Math.max(5, Math.ceil(text.length / 10)))
         
         // Show loading overlay
         showLoadingOverlay(estimatedSeconds);
