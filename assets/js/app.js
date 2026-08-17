@@ -3,6 +3,8 @@ const state = {
     currentPage: 'home',
     currentMode: 'tts',
     selectedVoice: 'thiha',
+    selectedApiType: localStorage.getItem('amkyaw_tts_api_type') || 'gemini',
+    selectedFormat: localStorage.getItem('amkyaw_tts_format') || 'mp3',
     charCount: 0,
     usageUsed: 0,
     usageLimit: 5000,
@@ -56,6 +58,9 @@ function initApp() {
 
     // Voice selection
     setupVoiceSelection();
+
+    // Format selection
+    setupFormatSelection();
 
     // Text input
     setupTextInput();
@@ -182,6 +187,35 @@ function setupVoiceSelection() {
     });
 }
 
+// ===== Format Selection =====
+function setupFormatSelection() {
+    // Load saved format
+    const savedFormat = localStorage.getItem('amkyaw_tts_format') || 'mp3';
+    const formatInputs = document.querySelectorAll('input[name="format"]');
+    
+    formatInputs.forEach(input => {
+        if (input.value === savedFormat) {
+            input.checked = true;
+            // Also update the label class
+            const label = input.closest('.format-option');
+            if (label) label.classList.add('selected');
+        }
+        
+        input.addEventListener('change', () => {
+            state.selectedFormat = input.value;
+            localStorage.setItem('amkyaw_tts_format', input.value);
+            
+            // Update label classes
+            formatInputs.forEach(i => {
+                const label = i.closest('.format-option');
+                if (label) label.classList.remove('selected');
+            });
+            const label = input.closest('.format-option');
+            if (label) label.classList.add('selected');
+        });
+    });
+}
+
 // ===== Text Input =====
 function setupTextInput() {
     elements.textInput.addEventListener('input', (e) => {
@@ -242,8 +276,9 @@ function setupGenerateButton() {
                 body: JSON.stringify({
                     text: text,
                     voice: state.selectedVoice,
-                    format: 'mp3',
-                    apiKey: apiKey
+                    format: state.selectedFormat,
+                    apiKey: apiKey,
+                    apiType: state.selectedApiType
                 })
             });
 
@@ -305,8 +340,19 @@ function showAudioPlayer(audioData, format, text) {
     playerDiv.innerHTML = `
         <div class="audio-player-content">
             <div class="audio-header">
-                <span class="audio-title">Generated Audio</span>
+                <span class="audio-title">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 18V5l12-2v13"/>
+                        <circle cx="6" cy="18" r="3"/>
+                        <circle cx="18" cy="16" r="3"/>
+                    </svg>
+                    Generated Audio
+                </span>
                 <button class="audio-close" onclick="closeAudioPlayer()">×</button>
+            </div>
+            <div class="audio-info">
+                <span class="audio-badge">${format.toUpperCase()}</span>
+                <span class="audio-chars">${text.length} characters</span>
             </div>
             <audio controls id="generatedAudio">
                 <source src="${audioData}" type="audio/${format}">
@@ -381,6 +427,15 @@ function setupApiKey() {
         elements.apiKeyInput.value = state.apiKey;
     }
 
+    // Load saved API type
+    const savedApiType = localStorage.getItem('amkyaw_tts_api_type') || 'gemini';
+    const apiTypeInputs = document.querySelectorAll('input[name="apiType"]');
+    apiTypeInputs.forEach(input => {
+        if (input.value === savedApiType) {
+            input.checked = true;
+        }
+    });
+
     // Toggle visibility
     elements.toggleVisibility.addEventListener('click', () => {
         const type = elements.apiKeyInput.type === 'password' ? 'text' : 'password';
@@ -391,6 +446,14 @@ function setupApiKey() {
         
         eyeOpen.classList.toggle('hidden');
         eyeClosed.classList.toggle('hidden');
+    });
+
+    // API Type selection
+    apiTypeInputs.forEach(input => {
+        input.addEventListener('change', () => {
+            state.selectedApiType = input.value;
+            localStorage.setItem('amkyaw_tts_api_type', input.value);
+        });
     });
 
     // Save API key

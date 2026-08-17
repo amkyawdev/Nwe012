@@ -15,7 +15,7 @@ module.exports = async (req, res) => {
   }
 
   try {
-    const { text, voice, format } = req.body;
+    const { text, voice, format, apiType } = req.body;
 
     if (!text) {
       return res.status(400).json({ error: 'Text is required' });
@@ -31,17 +31,26 @@ module.exports = async (req, res) => {
     const selectedVoice = voiceMap[voice] || voiceMap.default;
     const audioFormat = format === 'wav' ? 'LINEAR16' : 'MP3';
 
-    // Get API key from environment or request body
-    const apiKey = process.env.GEMINI_API_KEY || req.body.apiKey;
+    // API Type selection: 'gemini' or 'aistudio'
+    const selectedApiType = apiType || 'gemini';
+
+    // Get API key based on selected type
+    let apiKey = '';
+    
+    if (selectedApiType === 'aistudio') {
+      apiKey = process.env.AISTUDIO_API_KEY || req.body.apiKey;
+    } else {
+      apiKey = process.env.GEMINI_API_KEY || req.body.apiKey;
+    }
 
     if (!apiKey) {
       return res.status(400).json({ 
         error: 'API key required',
-        message: 'Please provide your Gemini/AI Studio API Key'
+        message: `Please provide your ${selectedApiType === 'aistudio' ? 'Ai Studio' : 'Gemini'} API Key`
       });
     }
 
-    // Use Google Cloud TTS API directly
+    // Use Google Cloud TTS API
     const ttsUrl = `https://texttospeech.googleapis.com/v1/text:synthesize?key=${apiKey}`;
 
     const ttsRequest = {

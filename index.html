@@ -296,6 +296,39 @@
                         </div>
                     </div>
 
+                    <div class="format-section">
+                        <h3 class="format-title">Output Format</h3>
+                        <div class="format-options">
+                            <label class="format-option selected">
+                                <input type="radio" name="format" value="mp3" checked>
+                                <span class="format-card">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M9 18V5l12-2v13"/>
+                                        <circle cx="6" cy="18" r="3"/>
+                                        <circle cx="18" cy="16" r="3"/>
+                                    </svg>
+                                    <span class="format-name">MP3</span>
+                                    <span class="format-desc">Smaller file, best compatibility</span>
+                                </span>
+                            </label>
+                            <label class="format-option">
+                                <input type="radio" name="format" value="wav">
+                                <span class="format-card">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M2 10v4"/>
+                                        <path d="M6 6v12"/>
+                                        <path d="M10 8v8"/>
+                                        <path d="M14 4v16"/>
+                                        <path d="M18 8v8"/>
+                                        <path d="M22 10v4"/>
+                                    </svg>
+                                    <span class="format-name">WAV</span>
+                                    <span class="format-desc">Lossless quality, larger file</span>
+                                </span>
+                            </label>
+                        </div>
+                    </div>
+
                     <button class="btn btn-primary btn-generate" id="generateBtn">
                         <span class="btn-text">အသံ ဖန်တီးမည်</span>
                         <span class="btn-loader">
@@ -365,7 +398,27 @@
             <div class="api-container">
                 <div class="api-card animate-card">
                     <div class="api-input-group">
-                        <label for="apiKey">Gemini / AI Studio API Key</label>
+                        <label>API Type</label>
+                        <div class="api-type-selector">
+                            <label class="api-type-option">
+                                <input type="radio" name="apiType" value="gemini" checked>
+                                <span class="api-type-label">
+                                    <span class="api-type-name">Gemini</span>
+                                    <span class="api-type-desc">Google Gemini API</span>
+                                </span>
+                            </label>
+                            <label class="api-type-option">
+                                <input type="radio" name="apiType" value="aistudio">
+                                <span class="api-type-label">
+                                    <span class="api-type-name">AI Studio</span>
+                                    <span class="api-type-desc">Google AI Studio</span>
+                                </span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="api-input-group">
+                        <label for="apiKey">API Key</label>
                         <div class="input-wrapper">
                             <input type="password" id="apiKey" placeholder="API Key ထည့်သွင်းပါ...">
                             <button class="btn-toggle-visibility" id="toggleVisibility">
