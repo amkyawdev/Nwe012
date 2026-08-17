@@ -1,3 +1,5 @@
+const { TextToSpeechClient } = require('@google-cloud/text-to-speech');
+
 module.exports = async (req, res) => {
   // CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -15,34 +17,63 @@ module.exports = async (req, res) => {
   }
 
   try {
-    const { text, voice, speed } = req.body;
+    const { text, voice, format } = req.body;
 
     if (!text) {
       return res.status(400).json({ error: 'Text is required' });
     }
 
-    // Voice mapping for Microsoft Edge TTS WebSocket API
+    // Voice mapping for Google Cloud TTS
     const voiceMap = {
-      'thiha': 'my-MM-HsenNeural',      // Male voice
-      'nayliya': 'my-MM-ThandarNeural', // Female voice
-      'default': 'my-MM-ThandarNeural'
+      'thiha': { name: 'my-MM-Standard-A', lang: 'my-MM', ssmlGender: 'MALE' },
+      'nayliya': { name: 'my-MM-Standard-A', lang: 'my-MM', ssmlGender: 'FEMALE' },
+      'default': { name: 'my-MM-Standard-A', lang: 'my-MM', ssmlGender: 'FEMALE' }
     };
 
     const selectedVoice = voiceMap[voice] || voiceMap.default;
-    
-    // Call external TTS API (using a free TTS service)
-    // Note: In production, you should use a paid service like Google Cloud TTS
-    // or Azure Speech Services with proper API keys
-    
-    // For demo, return a placeholder response
-    // Real implementation would call edge-tts or another TTS service
-    
+    const audioFormat = format === 'wav' ? 'LINEAR16' : 'MP3';
+
+    // Check for API key
+    const apiKey = process.env.GOOGLE_TTS_API_KEY;
+
+    if (!apiKey) {
+      return res.status(400).json({ 
+        error: 'API key required',
+        message: 'Please add GOOGLE_TTS_API_KEY in Vercel Environment Variables'
+      });
+    }
+
+    // Create client with API key
+    const client = new TextToSpeechClient({ apiKey });
+
+    // Construct the request
+    const request = {
+      input: { text: text },
+      voice: {
+        languageCode: selectedVoice.lang,
+        name: selectedVoice.name,
+        ssmlGender: selectedVoice.ssmlGender,
+      },
+      audioConfig: {
+        audioEncoding: audioFormat,
+        speakingRate: 0.9,
+        pitch: 0,
+      },
+    };
+
+    // Generate audio
+    const [response] = await client.synthesizeSpeech(request);
+
+    // Convert buffer to base64
+    const audioContent = response.audioContent.toString('base64');
+    const mimeType = audioFormat === 'MP3' ? 'audio/mp3' : 'audio/wav';
+
     return res.status(200).json({
       success: true,
-      message: 'TTS API ready. Configure your TTS service for production use.',
-      voice: selectedVoice,
-      charCount: text.length,
-      text: text
+      audio: `data:${mimeType};base64,${audioContent}`,
+      format: audioFormat === 'MP3' ? 'mp3' : 'wav',
+      voice: selectedVoice.name,
+      charCount: text.length
     });
 
   } catch (error) {

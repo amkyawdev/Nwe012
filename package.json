@@ -1,13 +1,13 @@
 {
   "name": "amkyawdev-tts",
   "version": "1.0.0",
-  "description": "Myanmar Text-to-Speech API",
+  "description": "Myanmar Text-to-Speech API with Google Cloud TTS",
   "main": "api/index.js",
   "scripts": {
-    "vercel-build": "npm install",
-    "build": "npm install"
+    "vercel-build": "npm install @google-cloud/text-to-speech",
+    "build": "npm install @google-cloud/text-to-speech"
   },
   "dependencies": {
-    "micro": "^10.0.1"
+    "@google-cloud/text-to-speech": "^5.0.1"
   }
 }

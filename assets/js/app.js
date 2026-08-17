@@ -225,27 +225,50 @@ function setupGenerateButton() {
         elements.generateBtn.disabled = true;
 
         try {
-            // Use Web Speech API for TTS (no API key needed)
-            await speakText(text, state.selectedVoice);
-            
-            // Update usage
-            state.usageUsed += text.length;
-            if (state.currentMode === 'tts') {
-                state.ttsCount++;
-            } else {
-                state.srtCount++;
+            // Call API
+            const response = await fetch(`${API_BASE}/api/tts`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    text: text,
+                    voice: state.selectedVoice,
+                    format: 'mp3'
+                })
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message || data.error || 'API request failed');
             }
-            
-            saveState();
-            updateUsageDisplay();
-            
-            showToast('အသံဖန်တီးပြီးပါပြီ! 🎉', 'success');
-            
-            // Clear input
-            elements.textInput.value = '';
-            state.charCount = 0;
-            elements.charCount.textContent = '0';
-            elements.charCount.style.color = 'var(--text-muted)';
+
+            if (data.success && data.audio) {
+                // Show audio player
+                showAudioPlayer(data.audio, data.format, text);
+                
+                // Update usage
+                state.usageUsed += text.length;
+                if (state.currentMode === 'tts') {
+                    state.ttsCount++;
+                } else {
+                    state.srtCount++;
+                }
+                
+                saveState();
+                updateUsageDisplay();
+                
+                showToast('အသံဖန်တီးပြီးပါပြီ! 🎉', 'success');
+                
+                // Clear input
+                elements.textInput.value = '';
+                state.charCount = 0;
+                elements.charCount.textContent = '0';
+                elements.charCount.style.color = 'var(--text-muted)';
+            } else {
+                throw new Error(data.message || 'Invalid response from server');
+            }
             
         } catch (error) {
             console.error('TTS Error:', error);
@@ -257,62 +280,90 @@ function setupGenerateButton() {
     });
 }
 
-// ===== Web Speech API TTS =====
-function speakText(text, voice) {
-    return new Promise((resolve, reject) => {
-        // Check if speech synthesis is supported
-        if (!('speechSynthesis' in window)) {
-            reject(new Error('Browser does not support speech synthesis'));
-            return;
-        }
+// ===== Audio Player =====
+let currentAudioData = null;
 
-        // Cancel any ongoing speech
-        window.speechSynthesis.cancel();
+function showAudioPlayer(audioData, format, text) {
+    // Remove existing player
+    const existingPlayer = document.querySelector('.audio-player');
+    if (existingPlayer) {
+        existingPlayer.remove();
+    }
 
-        const utterance = new SpeechSynthesisUtterance(text);
-        
-        // Set language to Burmese/Myanmar
-        utterance.lang = 'my-MM';
-        
-        // Adjust rate based on voice selection
-        utterance.rate = 0.9;
-        utterance.pitch = voice === 'thiha' ? 0.8 : 1.2;
-        
-        // Try to find a suitable voice
-        const voices = window.speechSynthesis.getVoices();
-        
-        // Look for Myanmar voices first, then fallback to any Burmese-supporting voice
-        let selectedVoice = voices.find(v => v.lang.includes('my')) ||
-                           voices.find(v => v.lang.includes('MM')) ||
-                           voices.find(v => v.lang.includes('Burmese')) ||
-                           voices[0]; // Fallback to first available voice
-        
-        if (selectedVoice) {
-            utterance.voice = selectedVoice;
-        }
+    // Create audio player element
+    const playerDiv = document.createElement('div');
+    playerDiv.className = 'audio-player';
+    playerDiv.innerHTML = `
+        <div class="audio-player-content">
+            <div class="audio-header">
+                <span class="audio-title">Generated Audio</span>
+                <button class="audio-close" onclick="closeAudioPlayer()">×</button>
+            </div>
+            <audio controls id="generatedAudio">
+                <source src="${audioData}" type="audio/${format}">
+                Your browser does not support audio playback.
+            </audio>
+            <div class="audio-actions">
+                <button class="btn btn-primary btn-download" onclick="downloadAudio('${audioData}', '${format}')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                        <polyline points="7 10 12 15 17 10"/>
+                        <line x1="12" x2="12" y1="15" y2="3"/>
+                    </svg>
+                    Download ${format.toUpperCase()}
+                </button>
+            </div>
+        </div>
+    `;
 
-        // Handle events
-        utterance.onend = () => resolve();
-        utterance.onerror = (event) => {
-            if (event.error !== 'canceled') {
-                reject(new Error(event.error || 'Speech synthesis failed'));
-            } else {
-                resolve(); // Consider cancel as success
-            }
-        };
+    // Insert after the studio card
+    const studioCard = document.querySelector('.studio-card');
+    if (studioCard) {
+        studioCard.parentNode.insertBefore(playerDiv, studioCard.nextSibling);
+    }
 
-        // Start speaking
-        window.speechSynthesis.speak(utterance);
-    });
+    // Auto play
+    const audio = document.getElementById('generatedAudio');
+    audio.play().catch(err => console.log('Auto-play blocked:', err));
+
+    // Store for download
+    currentAudioData = { audioData, format, text };
 }
 
-// Preload voices
-if ('speechSynthesis' in window) {
-    window.speechSynthesis.getVoices();
-    window.speechSynthesis.onvoiceschanged = () => {
-        window.speechSynthesis.getVoices();
-    };
+function closeAudioPlayer() {
+    const player = document.querySelector('.audio-player');
+    if (player) {
+        player.remove();
+    }
+    currentAudioData = null;
 }
+
+function downloadAudio(audioData, format) {
+    if (!audioData) return;
+
+    // Convert base64 to blob
+    const byteCharacters = atob(audioData.split(',')[1]);
+    const byteNumbers = new Array(byteCharacters.length);
+    for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
+    }
+    const byteArray = new Uint8Array(byteNumbers);
+    const blob = new Blob([byteArray], { type: `audio/${format}` });
+
+    // Create download link
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `myanmar-tts-${Date.now()}.${format}`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    showToast('Download started! 📥', 'success');
+}
+
+// Make functions global
+window.closeAudioPlayer = closeAudioPlayer;
+window.downloadAudio = downloadAudio;
 
 // ===== API Key =====
 function setupApiKey() {
